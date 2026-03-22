@@ -11,8 +11,8 @@ class LoginProxy {
       Uri.parse('$url/login'),
       body: {'email': email, 'password': password},
     );
+    final jsonResponse = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      final jsonResponse = jsonDecode(response.body);
       final result = jsonResponse['loginResult'];
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', result['token']);
@@ -20,19 +20,20 @@ class LoginProxy {
       await prefs.setString('name', result['name']);
       return true;
     } else {
-      return false;
+      throw jsonResponse['message'] ?? 'Login failed. Please try again.';
     }
   }
 
-  Future<String> doRegister(String name, String email, String password) async {
+  Future<bool> doRegister(String name, String email, String password) async {
     final response = await http.post(
       Uri.parse('$url/register'),
       body: {'name': name, 'email': email, 'password': password},
     );
+    final jsonResponse = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      return response.body;
+      return true;
     } else {
-      throw Exception('Failed to register');
+      throw jsonResponse['message'] ?? 'Registration failed. Please try again.';
     }
   }
 
