@@ -5,8 +5,9 @@ import 'package:intl/intl.dart';
 
 class DetailPage extends StatefulWidget {
   final StoryModel story;
+  final VoidCallback onBack;
 
-  const DetailPage({super.key, required this.story});
+  const DetailPage({super.key, required this.story, required this.onBack});
 
   @override
   State<DetailPage> createState() => _DetailPageState();
@@ -30,6 +31,7 @@ class _DetailPageState extends State<DetailPage> {
         final placemarks = await geo.placemarkFromCoordinates(lat, lon);
         if (placemarks.isNotEmpty) {
           final place = placemarks.first;
+          if (!mounted) return;
           setState(() {
             locationName = [
               place.subLocality,
@@ -40,6 +42,7 @@ class _DetailPageState extends State<DetailPage> {
           return;
         }
       } catch (e) {
+        if (!mounted) return;
         setState(() {
           locationName = 'Location not available';
         });
@@ -47,6 +50,7 @@ class _DetailPageState extends State<DetailPage> {
       }
     }
 
+    if (!mounted) return;
     setState(() {
       locationName = (lat != null && lon != null)
           ? 'Unknown location ($lat, $lon)'
@@ -60,7 +64,13 @@ class _DetailPageState extends State<DetailPage> {
     final dateFormat = DateFormat('dd MMM yyyy, HH:mm');
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Detail Story')),
+      appBar: AppBar(
+        title: const Text('Detail Story'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: widget.onBack,
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

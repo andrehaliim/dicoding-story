@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:story/pages/home-page.dart';
 import 'package:story/proxys/login-proxy.dart';
-import 'package:story/pages/register-page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final VoidCallback onLoginSuccess;
+  final VoidCallback onGoToRegister;
+
+  const LoginPage({
+    super.key,
+    required this.onLoginSuccess,
+    required this.onGoToRegister,
+  });
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -40,12 +45,10 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (success) {
-        if (!mounted) return;
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
+        widget.onLoginSuccess();
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
       );
@@ -163,13 +166,7 @@ class _LoginPageState extends State<LoginPage> {
                   textAlign: TextAlign.center,
                 ),
                 TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const RegisterPage(),
-                      ),
-                    );
-                  },
+                  onPressed: widget.onGoToRegister,
                   child: const Text('Register'),
                 ),
               ],

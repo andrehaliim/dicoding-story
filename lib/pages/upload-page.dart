@@ -6,7 +6,14 @@ import 'package:geolocator/geolocator.dart';
 import 'package:story/proxys/story-proxy.dart';
 
 class UploadPage extends StatefulWidget {
-  const UploadPage({super.key});
+  final VoidCallback onUploadSuccess;
+  final VoidCallback onBack;
+
+  const UploadPage({
+    super.key,
+    required this.onUploadSuccess,
+    required this.onBack,
+  });
 
   @override
   State<UploadPage> createState() => _UploadPageState();
@@ -97,9 +104,7 @@ class _UploadPageState extends State<UploadPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Story uploaded successfully!')),
         );
-        Navigator.of(
-          context,
-        ).pop(true); // Return to previous screen and optionally refresh
+        widget.onUploadSuccess();
       }
     } catch (e) {
       if (!mounted) return;
@@ -124,7 +129,13 @@ class _UploadPageState extends State<UploadPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Upload Story')),
+      appBar: AppBar(
+        title: const Text('Upload Story'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: widget.onBack,
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -187,31 +198,29 @@ class _UploadPageState extends State<UploadPage> {
             const SizedBox(height: 32),
 
             // 4. Upload Button
-            SizedBox(
-              child: ElevatedButton(
-                onPressed: !_isUploading ? _uploadStory : null,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                ),
-                child: _isUploading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Text(
-                        'Upload',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+            ElevatedButton(
+              onPressed: !_isUploading ? _uploadStory : null,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
               ),
+              child: _isUploading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text(
+                      'Upload',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
             ),
           ],
         ),

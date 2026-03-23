@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:story/pages/login-page.dart';
-import 'package:story/proxys/login-proxy.dart';
 import 'package:story/models/story-model.dart';
-import 'package:story/pages/detail-page.dart';
+import 'package:story/proxys/login-proxy.dart';
 import 'package:story/proxys/story-proxy.dart';
-import 'package:story/pages/upload-page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final void Function(StoryModel story) onGoToDetail;
+  final VoidCallback onGoToUpload;
+  final VoidCallback onLogout;
+
+  const HomePage({
+    super.key,
+    required this.onGoToDetail,
+    required this.onGoToUpload,
+    required this.onLogout,
+  });
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -22,18 +28,21 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     getNickname();
-    getStories();
+    _refreshStories();
   }
 
   Future<void> getNickname() async {
     final sharedPreferences = await SharedPreferences.getInstance();
+    if (!mounted) return;
     setState(() {
       nickname = sharedPreferences.getString('name') ?? '';
     });
   }
 
-  Future<void> getStories() async {
-    _stories = StoryProxy().getAllStories();
+  void _refreshStories() {
+    setState(() {
+      _stories = StoryProxy().getAllStories();
+    });
   }
 
   @override
@@ -44,7 +53,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => _logout(),
+            onPressed: _confirmLogout,
           ),
         ],
       ),
@@ -62,14 +71,7 @@ class _HomePageState extends State<HomePage> {
               itemBuilder: (context, index) {
                 final story = stories[index];
                 return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailPage(story: story),
-                      ),
-                    );
-                  },
+                  onTap: () => widget.onGoToDetail(story),
                   child: Card(
                     margin: const EdgeInsets.symmetric(
                       horizontal: 16.0,
@@ -92,7 +94,8 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               Text(
                                 story.name,
-                                style: Theme.of(context).textTheme.titleLarge,
+                                style:
+                                    Theme.of(context).textTheme.titleLarge,
                               ),
                               const SizedBox(height: 8),
                               Text(story.description),
@@ -110,23 +113,13 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const UploadPage()),
-          );
-          if (result == true) {
-            setState(() {
-              getStories();
-            });
-          }
-        },
+        onPressed: widget.onGoToUpload,
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  Future<void> _logout() async {
+  void _confirmLogout() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -134,17 +127,14 @@ class _HomePageState extends State<HomePage> {
         content: const Text('Are you sure you want to logout?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              final proxy = LoginProxy();
-              await proxy.doLogout();
-              if (!mounted) return;
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => const LoginPage()),
-              );
+              Navigator.of(context).pop(); // close dialog
+              await LoginProxy().doLogout();
+              widget.onLogout();
             },
             child: const Text('Logout'),
           ),

@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:story/proxys/login-proxy.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+  final VoidCallback onRegisterSuccess;
+  final VoidCallback onGoToLogin;
+
+  const RegisterPage({
+    super.key,
+    required this.onRegisterSuccess,
+    required this.onGoToLogin,
+  });
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -42,8 +49,15 @@ class _RegisterPageState extends State<RegisterPage> {
 
       if (success) {
         if (!mounted) return;
-        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Registration successful! Please login.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        widget.onRegisterSuccess();
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Registration failed'),
@@ -52,6 +66,7 @@ class _RegisterPageState extends State<RegisterPage> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
       );
@@ -67,7 +82,13 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Register')),
+      appBar: AppBar(
+        title: const Text('Register'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: widget.onGoToLogin,
+        ),
+      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -185,9 +206,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   textAlign: TextAlign.center,
                 ),
                 TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+                  onPressed: widget.onGoToLogin,
                   child: const Text('Login'),
                 ),
               ],
