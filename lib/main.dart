@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:story/pages/home-page.dart';
 import 'package:story/pages/login-page.dart';
 import 'package:story/proxys/login-proxy.dart';
+import 'package:story/routes/router-delegate.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,36 +18,25 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool? isLoggedIn;
+  late MyRouterDelegate myRouterDelegate;
 
   @override
   void initState() {
     super.initState();
-    _checkLogin();
-  }
-
-  Future<void> _checkLogin() async {
-    final auth = LoginProxy();
-    final result = await auth.isLoggedIn();
-
-    setState(() {
-      isLoggedIn = result;
-    });
+    myRouterDelegate = MyRouterDelegate();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoggedIn == null) {
-      return const MaterialApp(
-        home: Scaffold(body: Center(child: CircularProgressIndicator())),
-      );
-    }
-
     return MaterialApp(
       title: 'Dicoding Story',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: isLoggedIn! ? const HomePage() : const LoginPage(),
+      home: Router(
+        routerDelegate: myRouterDelegate,
+        backButtonDispatcher: RootBackButtonDispatcher(),
+      ),
     );
   }
 }

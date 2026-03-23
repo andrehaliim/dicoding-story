@@ -8,7 +8,9 @@ import 'package:story/proxys/story-proxy.dart';
 import 'package:story/pages/upload-page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final Function(StoryModel) onTapped;
+  final Function() onLogout;
+  const HomePage({super.key, required this.onTapped, required this.onLogout});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -63,12 +65,7 @@ class _HomePageState extends State<HomePage> {
                 final story = stories[index];
                 return GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailPage(story: story),
-                      ),
-                    );
+                    widget.onTapped(story);
                   },
                   child: Card(
                     margin: const EdgeInsets.symmetric(
@@ -142,9 +139,8 @@ class _HomePageState extends State<HomePage> {
               final proxy = LoginProxy();
               await proxy.doLogout();
               if (!mounted) return;
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => const LoginPage()),
-              );
+              Navigator.pop(context);
+              widget.onLogout();
             },
             child: const Text('Logout'),
           ),

@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:story/proxys/login-proxy.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+  final Function() onRegister;
+  final Function() onLogin;
+  const RegisterPage({
+    super.key,
+    required this.onRegister,
+    required this.onLogin,
+  });
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -42,7 +48,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
       if (success) {
         if (!mounted) return;
-        Navigator.of(context).pop();
+        widget.onRegister();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -186,7 +192,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    widget.onLogin();
                   },
                   child: const Text('Login'),
                 ),
