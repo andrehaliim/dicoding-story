@@ -2,14 +2,23 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'log-proxy.dart';
 
 class LoginProxy {
   final url = 'https://story-api.dicoding.dev/v1';
 
   Future<bool> doLogin(String email, String password) async {
+    final requestUrl = '$url/login';
+    final requestBody = {'email': email, 'password': password};
     final response = await http.post(
-      Uri.parse('$url/login'),
-      body: {'email': email, 'password': password},
+      Uri.parse(requestUrl),
+      body: requestBody,
+    );
+    LogProxy.apiFetchLog(
+      method: 'POST',
+      url: requestUrl,
+      parameters: requestBody,
+      response: response,
     );
     final jsonResponse = jsonDecode(response.body);
     if (response.statusCode == 200) {
@@ -25,9 +34,17 @@ class LoginProxy {
   }
 
   Future<bool> doRegister(String name, String email, String password) async {
+    final requestUrl = '$url/register';
+    final requestBody = {'name': name, 'email': email, 'password': password};
     final response = await http.post(
-      Uri.parse('$url/register'),
-      body: {'name': name, 'email': email, 'password': password},
+      Uri.parse(requestUrl),
+      body: requestBody,
+    );
+    LogProxy.apiFetchLog(
+      method: 'POST',
+      url: requestUrl,
+      parameters: requestBody,
+      response: response,
     );
     final jsonResponse = jsonDecode(response.body);
     if (response.statusCode == 200) {
