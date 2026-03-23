@@ -4,6 +4,7 @@ import 'package:story/pages/detail-page.dart';
 import 'package:story/pages/home-page.dart';
 import 'package:story/pages/login-page.dart';
 import 'package:story/pages/register-page.dart';
+import 'package:story/pages/upload-page.dart';
 import 'package:story/proxys/login-proxy.dart';
 
 class MyRouterDelegate extends RouterDelegate
@@ -12,6 +13,8 @@ class MyRouterDelegate extends RouterDelegate
   List<Page> pageStack = [];
   bool? isLoggedIn;
   bool isRegister = false;
+  bool isUploading = false;
+  int storyRefreshCount = 0;
   StoryModel? selectedStory;
 
   MyRouterDelegate() : _navigatorKey = GlobalKey<NavigatorState>() {
@@ -44,8 +47,12 @@ class MyRouterDelegate extends RouterDelegate
           selectedStory = null;
           notifyListeners();
         }
-        if (page.key == const ValueKey("RegisterPage")) {
+        if (page.key == const ValueKey('RegisterPage')) {
           isRegister = false;
+          notifyListeners();
+        }
+        if (page.key == const ValueKey('UploadPage')) {
+          isUploading = false;
           notifyListeners();
         }
       },
@@ -97,8 +104,9 @@ class MyRouterDelegate extends RouterDelegate
 
   List<Page> get _loggedInStack => [
     MaterialPage(
-      key: const ValueKey("QuotesListPage"),
+      key: const ValueKey('StoryListPage'),
       child: HomePage(
+        refreshCount: storyRefreshCount,
         onTapped: (StoryModel story) {
           selectedStory = story;
           notifyListeners();
@@ -107,12 +115,27 @@ class MyRouterDelegate extends RouterDelegate
           isLoggedIn = false;
           notifyListeners();
         },
+        onUpload: () {
+          isUploading = true;
+          notifyListeners();
+        },
       ),
     ),
     if (selectedStory != null)
       MaterialPage(
         key: ValueKey(selectedStory),
         child: DetailPage(story: selectedStory!),
+      ),
+    if (isUploading)
+      MaterialPage(
+        key: const ValueKey('UploadPage'),
+        child: UploadPage(
+          onUpload: () {
+            isUploading = false;
+            storyRefreshCount++;
+            notifyListeners();
+          },
+        ),
       ),
   ];
 }

@@ -6,7 +6,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:story/proxys/story-proxy.dart';
 
 class UploadPage extends StatefulWidget {
-  const UploadPage({super.key});
+  final Function() onUpload;
+  const UploadPage({super.key, required this.onUpload});
 
   @override
   State<UploadPage> createState() => _UploadPageState();
@@ -97,9 +98,7 @@ class _UploadPageState extends State<UploadPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Story uploaded successfully!')),
         );
-        Navigator.of(
-          context,
-        ).pop(true); // Return to previous screen and optionally refresh
+        widget.onUpload();
       }
     } catch (e) {
       if (!mounted) return;

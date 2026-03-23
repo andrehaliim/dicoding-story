@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:story/pages/login-page.dart';
 import 'package:story/proxys/login-proxy.dart';
 import 'package:story/models/story-model.dart';
-import 'package:story/pages/detail-page.dart';
 import 'package:story/proxys/story-proxy.dart';
-import 'package:story/pages/upload-page.dart';
 
 class HomePage extends StatefulWidget {
   final Function(StoryModel) onTapped;
   final Function() onLogout;
-  const HomePage({super.key, required this.onTapped, required this.onLogout});
+  final Function() onUpload;
+  final int refreshCount;
+  const HomePage({
+    super.key,
+    required this.onTapped,
+    required this.onLogout,
+    required this.onUpload,
+    this.refreshCount = 0,
+  });
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -25,6 +30,16 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     getNickname();
     getStories();
+  }
+
+  @override
+  void didUpdateWidget(HomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.refreshCount != widget.refreshCount) {
+      setState(() {
+        getStories();
+      });
+    }
   }
 
   Future<void> getNickname() async {
@@ -107,17 +122,7 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const UploadPage()),
-          );
-          if (result == true) {
-            setState(() {
-              getStories();
-            });
-          }
-        },
+        onPressed: widget.onUpload,
         child: const Icon(Icons.add),
       ),
     );
