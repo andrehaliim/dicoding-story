@@ -7,15 +7,15 @@ class LogHelper {
     required String method,
     required String url,
     dynamic parameters,
-    required http.Response response,
+    required http.Response? response,
   }) {
     log('==============================');
     log('API FETCH ($method): $url');
     if (parameters != null) {
       log('API PARAMETER: $parameters');
     }
-    log('API RESPONSE CODE: ${response.statusCode}');
-    log('API RESPONSE BODY: ${response.body}');
+    log('API RESPONSE CODE: ${response?.statusCode}');
+    log('API RESPONSE BODY: ${response?.body}');
     log('==============================');
   }
 }

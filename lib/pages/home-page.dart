@@ -5,6 +5,7 @@ import 'package:story/proxys/login-proxy.dart';
 import 'package:story/models/story-model.dart';
 import 'package:story/pages/detail-page.dart';
 import 'package:story/proxys/story-proxy.dart';
+import 'package:story/pages/upload-page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -107,6 +108,20 @@ class _HomePageState extends State<HomePage> {
           }
           return const Center(child: Text('No stories found'));
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const UploadPage()),
+          );
+          if (result == true) {
+            setState(() {
+              getStories();
+            });
+          }
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }
