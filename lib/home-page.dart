@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story/login-page.dart';
 import 'package:story/login_proxy.dart';
 import 'package:story/story-model.dart';
+import 'package:story/detail-page.dart';
 import 'package:story/story-proxy.dart';
 
 class HomePage extends StatefulWidget {
@@ -38,7 +39,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Story'),
+        title: const Text('Story'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -59,36 +60,43 @@ class _HomePageState extends State<HomePage> {
               itemCount: stories.length,
               itemBuilder: (context, index) {
                 final story = stories[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Image.network(
-                        story.photoUrl,
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailPage(story: story),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              story.name,
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(story.description),
-                          ],
+                    );
+                  },
+                  child: Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    clipBehavior: Clip.antiAlias,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Image.network(
+                          story.photoUrl,
+                          width: double.infinity,
+                          height: 200,
+                          fit: BoxFit.cover,
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                story.name,
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(story.description),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
