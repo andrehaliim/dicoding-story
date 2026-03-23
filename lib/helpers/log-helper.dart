@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:http/http.dart' as http;
 
-class LogProxy {
+class LogHelper {
   static void apiFetchLog({
     required String method,
     required String url,

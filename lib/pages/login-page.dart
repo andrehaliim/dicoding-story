@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:story/home-page.dart';
-import 'package:story/login_proxy.dart';
-import 'package:story/register-page.dart';
+import 'package:story/pages/home-page.dart';
+import 'package:story/proxys/login-proxy.dart';
+import 'package:story/pages/register-page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -47,10 +47,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
       );
     } finally {
       if (mounted) {

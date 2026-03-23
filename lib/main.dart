@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:story/home-page.dart';
-import 'package:story/login-page.dart';
-import 'package:story/login_proxy.dart';
+import 'package:story/pages/home-page.dart';
+import 'package:story/pages/login-page.dart';
+import 'package:story/proxys/login-proxy.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

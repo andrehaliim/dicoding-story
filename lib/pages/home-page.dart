@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:story/login-page.dart';
-import 'package:story/login_proxy.dart';
-import 'package:story/story-model.dart';
-import 'package:story/detail-page.dart';
-import 'package:story/story-proxy.dart';
+import 'package:story/pages/login-page.dart';
+import 'package:story/proxys/login-proxy.dart';
+import 'package:story/models/story-model.dart';
+import 'package:story/pages/detail-page.dart';
+import 'package:story/proxys/story-proxy.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -70,7 +70,10 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                   child: Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
                     clipBehavior: Clip.antiAlias,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

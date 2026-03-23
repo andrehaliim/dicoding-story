@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:story/login_proxy.dart';
+import 'package:story/proxys/login-proxy.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});

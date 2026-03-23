@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:story/story-model.dart';
-import 'log-proxy.dart';
+import 'package:story/models/story-model.dart';
+import '../helpers/log-helper.dart';
 
 class StoryProxy {
   final url = 'https://story-api.dicoding.dev/v1';
@@ -18,7 +18,7 @@ class StoryProxy {
       Uri.parse(requestUrl),
       headers: requestHeaders,
     );
-    LogProxy.apiFetchLog(
+    LogHelper.apiFetchLog(
       method: 'GET',
       url: requestUrl,
       parameters: requestHeaders,

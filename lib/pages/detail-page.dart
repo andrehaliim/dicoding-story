@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:story/story-model.dart';
+import 'package:story/models/story-model.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:intl/intl.dart';
 
@@ -35,7 +35,7 @@ class _DetailPageState extends State<DetailPage> {
               place.subLocality,
               place.locality,
               place.country,
-            ].where((e) => e != null && e!.isNotEmpty).join(', ');
+            ].where((e) => e != null && e.isNotEmpty).join(', ');
           });
           return;
         }
