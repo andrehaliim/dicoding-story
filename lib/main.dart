@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:story/pages/home-page.dart';
-import 'package:story/pages/login-page.dart';
-import 'package:story/proxys/login-proxy.dart';
 import 'package:story/routes/router-delegate.dart';
 
 void main() {

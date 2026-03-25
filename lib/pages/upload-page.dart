@@ -129,7 +129,6 @@ class _UploadPageState extends State<UploadPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 1. Image Preview
             Container(
               height: 250,
               width: double.infinity,
@@ -146,7 +145,6 @@ class _UploadPageState extends State<UploadPage> {
             ),
             const SizedBox(height: 16),
 
-            // 2. Buttons for Camera and Gallery
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -172,7 +170,6 @@ class _UploadPageState extends State<UploadPage> {
             ),
             const SizedBox(height: 24),
 
-            // 3. Description TextField
             TextField(
               controller: _descriptionController,
               maxLines: 4,
@@ -185,7 +182,6 @@ class _UploadPageState extends State<UploadPage> {
             ),
             const SizedBox(height: 32),
 
-            // 4. Upload Button
             SizedBox(
               child: ElevatedButton(
                 onPressed: !_isUploading ? _uploadStory : null,
