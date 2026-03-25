@@ -5,6 +5,7 @@ import 'package:story/pages/home-page.dart';
 import 'package:story/pages/login-page.dart';
 import 'package:story/pages/register-page.dart';
 import 'package:story/pages/upload-page.dart';
+import 'package:story/pages/logout-dialog-page.dart';
 import 'package:story/proxys/login-proxy.dart';
 
 class MyRouterDelegate extends RouterDelegate
@@ -14,6 +15,7 @@ class MyRouterDelegate extends RouterDelegate
   bool? isLoggedIn;
   bool isRegister = false;
   bool isUploading = false;
+  bool isLogoutDialog = false;
   int storyRefreshCount = 0;
   StoryModel? selectedStory;
 
@@ -53,6 +55,10 @@ class MyRouterDelegate extends RouterDelegate
         }
         if (page.key == const ValueKey('UploadPage')) {
           isUploading = false;
+          notifyListeners();
+        }
+        if (page.key == const ValueKey('LogoutDialogPage')) {
+          isLogoutDialog = false;
           notifyListeners();
         }
       },
@@ -110,8 +116,8 @@ class MyRouterDelegate extends RouterDelegate
           selectedStory = story;
           notifyListeners();
         },
-        onLogout: () {
-          isLoggedIn = false;
+        onShowLogoutDialog: () {
+          isLogoutDialog = true;
           notifyListeners();
         },
         onUpload: () {
@@ -135,6 +141,19 @@ class MyRouterDelegate extends RouterDelegate
             notifyListeners();
           },
         ),
+      ),
+    if (isLogoutDialog)
+      LogoutDialogPage(
+        key: const ValueKey('LogoutDialogPage'),
+        onLogout: () {
+          isLogoutDialog = false;
+          isLoggedIn = false;
+          notifyListeners();
+        },
+        onCancel: () {
+          isLogoutDialog = false;
+          notifyListeners();
+        },
       ),
   ];
 }

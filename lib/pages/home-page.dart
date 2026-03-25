@@ -3,19 +3,18 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story/l10n/app_localizations.dart';
 import 'package:story/providers/locale_provider.dart';
-import 'package:story/proxys/login-proxy.dart';
 import 'package:story/models/story-model.dart';
 import 'package:story/proxys/story-proxy.dart';
 
 class HomePage extends StatefulWidget {
   final Function(StoryModel) onTapped;
-  final Function() onLogout;
+  final Function() onShowLogoutDialog;
   final Function() onUpload;
   final int refreshCount;
   const HomePage({
     super.key,
     required this.onTapped,
-    required this.onLogout,
+    required this.onShowLogoutDialog,
     required this.onUpload,
     this.refreshCount = 0,
   });
@@ -69,15 +68,12 @@ class _HomePageState extends State<HomePage> {
             onPressed: () => localeProvider.toggleLocale(),
             child: Text(
               localeProvider.isEnglish ? 'ID' : 'EN',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
           ),
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => _logout(l10n),
+            onPressed: widget.onShowLogoutDialog,
           ),
         ],
       ),
@@ -143,30 +139,5 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  Future<void> _logout(AppLocalizations l10n) async {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.logout),
-        content: Text(l10n.logoutConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () async {
-              final proxy = LoginProxy();
-              await proxy.doLogout();
-              if (!mounted) return;
-              Navigator.pop(context);
-              widget.onLogout();
-            },
-            child: Text(l10n.logout),
-          ),
-        ],
-      ),
-    );
-  }
 }
+
