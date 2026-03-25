@@ -46,13 +46,19 @@ class _RegisterPageState extends State<RegisterPage> {
         _emailController.text,
         _passwordController.text,
       );
+      final l10n = AppLocalizations.of(context)!;
 
       if (success) {
         if (!mounted) return;
         widget.onRegister();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.registrationSuccess),
+            backgroundColor: Colors.green,
+          ),
+        );
       } else {
         if (!mounted) return;
-        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.registrationFailed),

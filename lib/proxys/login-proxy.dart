@@ -41,7 +41,7 @@ class LoginProxy {
       response: response,
     );
     final jsonResponse = jsonDecode(response.body);
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       return true;
     } else {
       throw jsonResponse['message'] ?? 'Registration failed. Please try again.';

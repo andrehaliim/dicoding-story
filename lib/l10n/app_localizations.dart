@@ -54,6 +54,8 @@ class AppLocalizations {
       _isId ? 'Sudah punya akun?' : 'Already have an account?';
   String get registrationFailed =>
       _isId ? 'Pendaftaran gagal' : 'Registration failed';
+  String get registrationSuccess =>
+      _isId ? 'Pendaftaran berhasil' : 'Registration success';
 
   String get uploadStory => _isId ? 'Unggah Cerita' : 'Upload Story';
   String get camera => _isId ? 'Kamera' : 'Camera';
