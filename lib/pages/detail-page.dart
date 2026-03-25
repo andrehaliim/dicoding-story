@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:story/l10n/app_localizations.dart';
 import 'package:story/models/story-model.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:intl/intl.dart';
@@ -13,7 +14,7 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
-  String locationName = 'Loading location...';
+  String? _locationName;
 
   @override
   void initState() {
@@ -31,7 +32,7 @@ class _DetailPageState extends State<DetailPage> {
         if (placemarks.isNotEmpty) {
           final place = placemarks.first;
           setState(() {
-            locationName = [
+            _locationName = [
               place.subLocality,
               place.locality,
               place.country,
@@ -41,26 +42,42 @@ class _DetailPageState extends State<DetailPage> {
         }
       } catch (e) {
         setState(() {
-          locationName = 'Location not available';
+          _locationName = null;
         });
         return;
       }
+      setState(() {
+        _locationName = '__unknown__${lat}__${lon}';
+      });
+    } else {
+      setState(() {
+        _locationName = null;
+      });
     }
-
-    setState(() {
-      locationName = (lat != null && lon != null)
-          ? 'Unknown location ($lat, $lon)'
-          : 'Location not available';
-    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final story = widget.story;
     final dateFormat = DateFormat('dd MMM yyyy, HH:mm');
 
+    String displayLocation;
+    if (_locationName == null) {
+      displayLocation = l10n.locationNotAvailable;
+    } else if (_locationName!.startsWith('__unknown__')) {
+      final parts = _locationName!.split('__');
+      final lat = double.tryParse(parts[2]) ?? 0;
+      final lon = double.tryParse(parts[3]) ?? 0;
+      displayLocation = l10n.unknownLocation(lat, lon);
+    } else if (_locationName!.isEmpty) {
+      displayLocation = l10n.loadingLocation;
+    } else {
+      displayLocation = _locationName!;
+    }
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Detail Story')),
+      appBar: AppBar(title: Text(l10n.detailStory)),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,7 +123,7 @@ class _DetailPageState extends State<DetailPage> {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          locationName,
+                          displayLocation,
                           style: const TextStyle(color: Colors.grey),
                         ),
                       ),

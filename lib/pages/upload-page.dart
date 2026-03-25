@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:story/l10n/app_localizations.dart';
 import 'package:story/proxys/story-proxy.dart';
 
 class UploadPage extends StatefulWidget {
@@ -20,6 +21,7 @@ class _UploadPageState extends State<UploadPage> {
   bool _isUploading = false;
 
   Future<void> _pickImage(ImageSource source) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final XFile? pickedFile = await _picker.pickImage(
         source: source,
@@ -34,7 +36,7 @@ class _UploadPageState extends State<UploadPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Failed to pick image: $e')));
+      ).showSnackBar(SnackBar(content: Text(l10n.failedPickImage(e.toString()))));
     }
   }
 
@@ -63,9 +65,11 @@ class _UploadPageState extends State<UploadPage> {
   }
 
   Future<void> _uploadStory() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_imageFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select an image first')),
+        SnackBar(content: Text(l10n.selectImage)),
       );
       return;
     }
@@ -73,7 +77,7 @@ class _UploadPageState extends State<UploadPage> {
     final description = _descriptionController.text.trim();
     if (description.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a description')),
+        SnackBar(content: Text(l10n.enterDescription)),
       );
       return;
     }
@@ -96,7 +100,7 @@ class _UploadPageState extends State<UploadPage> {
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Story uploaded successfully!')),
+          SnackBar(content: Text(l10n.uploadSuccess)),
         );
         widget.onUpload();
       }
@@ -104,7 +108,7 @@ class _UploadPageState extends State<UploadPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
+      ).showSnackBar(SnackBar(content: Text(l10n.uploadFailed(e.toString()))));
     } finally {
       if (mounted) {
         setState(() {
@@ -122,8 +126,9 @@ class _UploadPageState extends State<UploadPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Upload Story')),
+      appBar: AppBar(title: Text(l10n.uploadStory)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -155,7 +160,7 @@ class _UploadPageState extends State<UploadPage> {
                   ),
                   onPressed: () => _pickImage(ImageSource.camera),
                   icon: const Icon(Icons.camera_alt),
-                  label: const Text('Camera'),
+                  label: Text(l10n.camera),
                 ),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -164,7 +169,7 @@ class _UploadPageState extends State<UploadPage> {
                   ),
                   onPressed: () => _pickImage(ImageSource.gallery),
                   icon: const Icon(Icons.photo_library),
-                  label: const Text('Gallery'),
+                  label: Text(l10n.gallery),
                 ),
               ],
             ),
@@ -173,11 +178,11 @@ class _UploadPageState extends State<UploadPage> {
             TextField(
               controller: _descriptionController,
               maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: 'Description',
+              decoration: InputDecoration(
+                labelText: l10n.description,
                 alignLabelWithHint: true,
-                border: OutlineInputBorder(),
-                hintText: 'Enter your story description...',
+                border: const OutlineInputBorder(),
+                hintText: l10n.descriptionHint,
               ),
             ),
             const SizedBox(height: 32),
@@ -199,9 +204,9 @@ class _UploadPageState extends State<UploadPage> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text(
-                        'Upload',
-                        style: TextStyle(
+                    : Text(
+                        l10n.upload,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),

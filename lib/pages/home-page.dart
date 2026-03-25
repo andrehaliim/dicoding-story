@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:story/l10n/app_localizations.dart';
+import 'package:story/providers/locale_provider.dart';
 import 'package:story/proxys/login-proxy.dart';
 import 'package:story/models/story-model.dart';
 import 'package:story/proxys/story-proxy.dart';
@@ -55,13 +58,26 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final localeProvider = context.watch<LocaleProvider>();
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Story'),
+        title: Text(l10n.story),
         actions: [
+          TextButton(
+            onPressed: () => localeProvider.toggleLocale(),
+            child: Text(
+              localeProvider.isEnglish ? 'ID' : 'EN',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => _logout(),
+            onPressed: () => _logout(l10n),
           ),
         ],
       ),
@@ -118,7 +134,7 @@ class _HomePageState extends State<HomePage> {
               },
             );
           }
-          return const Center(child: Text('No stories found'));
+          return Center(child: Text(l10n.noStories));
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -128,16 +144,16 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<void> _logout() async {
+  Future<void> _logout(AppLocalizations l10n) async {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
+        title: Text(l10n.logout),
+        content: Text(l10n.logoutConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () async {
@@ -147,7 +163,7 @@ class _HomePageState extends State<HomePage> {
               Navigator.pop(context);
               widget.onLogout();
             },
-            child: const Text('Logout'),
+            child: Text(l10n.logout),
           ),
         ],
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:story/l10n/app_localizations.dart';
 import 'package:story/proxys/login-proxy.dart';
 
 class LoginPage extends StatefulWidget {
@@ -59,6 +60,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -75,26 +77,29 @@ class _LoginPageState extends State<LoginPage> {
                   color: Colors.deepPurple,
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'Welcome to\nDicoding Story',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                Text(
+                  l10n.welcomeTo,
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 48),
                 TextFormField(
                   controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
+                  decoration: InputDecoration(
+                    labelText: l10n.email,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.email),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
+                      return l10n.enterEmail;
                     }
                     if (!value.contains('@')) {
-                      return 'Please enter a valid email';
+                      return l10n.validEmail;
                     }
                     return null;
                   },
@@ -103,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
                 TextFormField(
                   controller: _passwordController,
                   decoration: InputDecoration(
-                    labelText: 'Password',
+                    labelText: l10n.password,
                     border: const OutlineInputBorder(),
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
@@ -122,10 +127,10 @@ class _LoginPageState extends State<LoginPage> {
                   obscureText: _obscurePassword,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
+                      return l10n.enterPassword;
                     }
                     if (value.length < 8) {
-                      return 'Password must be at least 8 characters';
+                      return l10n.passwordLength;
                     }
                     return null;
                   },
@@ -147,25 +152,25 @@ class _LoginPageState extends State<LoginPage> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text(
-                          'Login',
-                          style: TextStyle(
+                      : Text(
+                          l10n.login,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                 ),
                 const SizedBox(height: 32),
-                const Text(
-                  'Don\'t have an account?',
-                  style: TextStyle(fontSize: 16),
+                Text(
+                  l10n.noAccount,
+                  style: const TextStyle(fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
                 TextButton(
                   onPressed: () {
                     widget.onRegister();
                   },
-                  child: const Text('Register'),
+                  child: Text(l10n.register),
                 ),
               ],
             ),

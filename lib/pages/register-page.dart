@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:story/l10n/app_localizations.dart';
 import 'package:story/proxys/login-proxy.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -50,9 +51,11 @@ class _RegisterPageState extends State<RegisterPage> {
         if (!mounted) return;
         widget.onRegister();
       } else {
+        if (!mounted) return;
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Registration failed'),
+          SnackBar(
+            content: Text(l10n.registrationFailed),
             backgroundColor: Colors.red,
           ),
         );
@@ -72,8 +75,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Register')),
+      appBar: AppBar(title: Text(l10n.register)),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -89,22 +93,25 @@ class _RegisterPageState extends State<RegisterPage> {
                   color: Colors.deepPurple,
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'Create Account',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                Text(
+                  l10n.createAccount,
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 48),
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Name',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person),
+                  decoration: InputDecoration(
+                    labelText: l10n.name,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.person),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your name';
+                      return l10n.enterName;
                     }
                     return null;
                   },
@@ -112,18 +119,18 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
+                  decoration: InputDecoration(
+                    labelText: l10n.email,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.email),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
+                      return l10n.enterEmail;
                     }
                     if (!value.contains('@')) {
-                      return 'Please enter a valid email';
+                      return l10n.validEmail;
                     }
                     return null;
                   },
@@ -132,7 +139,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 TextFormField(
                   controller: _passwordController,
                   decoration: InputDecoration(
-                    labelText: 'Password',
+                    labelText: l10n.password,
                     border: const OutlineInputBorder(),
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
@@ -151,10 +158,10 @@ class _RegisterPageState extends State<RegisterPage> {
                   obscureText: _obscurePassword,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
+                      return l10n.enterPassword;
                     }
                     if (value.length < 8) {
-                      return 'Password must be at least 8 characters';
+                      return l10n.passwordLength;
                     }
                     return null;
                   },
@@ -176,25 +183,25 @@ class _RegisterPageState extends State<RegisterPage> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text(
-                          'Register',
-                          style: TextStyle(
+                      : Text(
+                          l10n.register,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                 ),
                 const SizedBox(height: 32),
-                const Text(
-                  'Already have an account?',
-                  style: TextStyle(fontSize: 16),
+                Text(
+                  l10n.alreadyAccount,
+                  style: const TextStyle(fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
                 TextButton(
                   onPressed: () {
                     widget.onLogin();
                   },
-                  child: const Text('Login'),
+                  child: Text(l10n.login),
                 ),
               ],
             ),
