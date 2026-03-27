@@ -1,9 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:story/helpers/location-helper.dart';
 import 'package:story/l10n/app_localizations.dart';
+import 'package:story/pages/map-picker-page.dart';
 import 'package:story/proxys/story-proxy.dart';
 
 class UploadPage extends StatefulWidget {
@@ -19,6 +22,27 @@ class _UploadPageState extends State<UploadPage> {
   final TextEditingController _descriptionController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   bool _isUploading = false;
+  String _locationName = "";
+  Position? _position;
+  LatLng? _selectedLatLng;
+  @override
+  void initState() {
+    super.initState();
+    _getLocationName();
+  }
+
+  Future<void> _getLocationName() async {
+    _position = await LocationHelper().determinePosition();
+    if (_position != null) {
+      final locationName = await LocationHelper().getLocationName(
+        _position!.latitude,
+        _position!.longitude,
+      );
+      setState(() {
+        _locationName = locationName;
+      });
+    }
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     final l10n = AppLocalizations.of(context)!;
@@ -34,51 +58,27 @@ class _UploadPageState extends State<UploadPage> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.failedPickImage(e.toString()))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.failedPickImage(e.toString()))),
+      );
     }
-  }
-
-  Future<Position?> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return null;
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return null;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      return null;
-    }
-
-    return await Geolocator.getCurrentPosition();
   }
 
   Future<void> _uploadStory() async {
     final l10n = AppLocalizations.of(context)!;
 
     if (_imageFile == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.selectImage)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.selectImage)));
       return;
     }
 
     final description = _descriptionController.text.trim();
     if (description.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.enterDescription)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.enterDescription)));
       return;
     }
 
@@ -87,21 +87,29 @@ class _UploadPageState extends State<UploadPage> {
     });
 
     try {
-      final position = await _determinePosition();
+      if (_selectedLatLng == null && _position == null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.locationNotSelected)));
+        return;
+      }
+
+      double? lat = _selectedLatLng?.latitude ?? _position?.latitude;
+      double? lon = _selectedLatLng?.longitude ?? _position?.longitude;
 
       final success = await StoryProxy().uploadStory(
         file: _imageFile!,
         description: description,
-        lat: position?.latitude,
-        lon: position?.longitude,
+        lat: lat,
+        lon: lon,
       );
 
       if (!mounted) return;
 
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.uploadSuccess)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.uploadSuccess)));
         widget.onUpload();
       }
     } catch (e) {
@@ -184,6 +192,40 @@ class _UploadPageState extends State<UploadPage> {
                 border: const OutlineInputBorder(),
                 hintText: l10n.descriptionHint,
               ),
+            ),
+            const SizedBox(height: 32),
+
+            Row(
+              children: [
+                Icon(Icons.location_on),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(_locationName, overflow: TextOverflow.ellipsis),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const MapPickerPage()),
+                    );
+
+                    if (result != null) {
+                      LatLng selected = result;
+                      String newLocation = await LocationHelper()
+                          .getLocationName(
+                            selected.latitude,
+                            selected.longitude,
+                          );
+                      setState(() {
+                        _selectedLatLng = selected;
+                        _locationName = newLocation;
+                      });
+                    }
+                  },
+                  child: Icon(Icons.edit),
+                ),
+              ],
             ),
             const SizedBox(height: 32),
 

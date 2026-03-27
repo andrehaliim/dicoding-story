@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:story/helpers/location-helper.dart';
 import 'package:story/l10n/app_localizations.dart';
 import 'package:story/models/story-model.dart';
-import 'package:geocoding/geocoding.dart' as geo;
 import 'package:intl/intl.dart';
 
 class DetailPage extends StatefulWidget {
@@ -14,46 +15,40 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
-  String? _locationName;
+  late GoogleMapController mapController;
+  final Set<Marker> markers = {};
+  bool _showMap = false;
 
   @override
   void initState() {
     super.initState();
-    _getLocationName();
+    _adjustMarker();
   }
 
-  Future<void> _getLocationName() async {
+  void _adjustMarker() async {
     final lat = widget.story.lat;
     final lon = widget.story.lon;
 
-    if (lat != null && lon != null) {
-      try {
-        final placemarks = await geo.placemarkFromCoordinates(lat, lon);
-        if (placemarks.isNotEmpty) {
-          final place = placemarks.first;
-          setState(() {
-            _locationName = [
-              place.subLocality,
-              place.locality,
-              place.country,
-            ].where((e) => e != null && e.isNotEmpty).join(', ');
-          });
-          return;
-        }
-      } catch (e) {
-        setState(() {
-          _locationName = null;
-        });
-        return;
-      }
-      setState(() {
-        _locationName = '__unknown__${lat}__${lon}';
-      });
-    } else {
-      setState(() {
-        _locationName = null;
-      });
-    }
+    if (lat == null || lon == null) return;
+
+    final place = await LocationHelper().getLocationName(lat, lon);
+
+    if (place.isEmpty) return;
+
+    final marker = Marker(
+      markerId: const MarkerId("storyLocation"),
+      position: LatLng(lat, lon),
+      infoWindow: InfoWindow(title: place),
+      onTap: () {
+        mapController.animateCamera(
+          CameraUpdate.newLatLngZoom(LatLng(lat, lon), 18),
+        );
+      },
+    );
+    markers.add(marker);
+    setState(() {
+      _showMap = true;
+    });
   }
 
   @override
@@ -62,83 +57,87 @@ class _DetailPageState extends State<DetailPage> {
     final story = widget.story;
     final dateFormat = DateFormat('dd MMM yyyy, HH:mm');
 
-    String displayLocation;
-    if (_locationName == null) {
-      displayLocation = l10n.locationNotAvailable;
-    } else if (_locationName!.startsWith('__unknown__')) {
-      final parts = _locationName!.split('__');
-      final lat = double.tryParse(parts[2]) ?? 0;
-      final lon = double.tryParse(parts[3]) ?? 0;
-      displayLocation = l10n.unknownLocation(lat, lon);
-    } else if (_locationName!.isEmpty) {
-      displayLocation = l10n.loadingLocation;
-    } else {
-      displayLocation = _locationName!;
-    }
-
     return Scaffold(
       appBar: AppBar(title: Text(l10n.detailStory)),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.network(
-              story.photoUrl,
-              width: double.infinity,
-              height: 300,
-              fit: BoxFit.cover,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    story.name,
-                    style: Theme.of(context).textTheme.headlineMedium,
+      body: Stack(
+        children: [
+          _showMap
+              ? Center(
+                  child: GoogleMap(
+                    markers: markers,
+                    initialCameraPosition: CameraPosition(
+                      zoom: 18,
+                      target: LatLng(widget.story.lat!, widget.story.lon!),
+                    ),
+                    onMapCreated: (controller) {
+                      setState(() {
+                        mapController = controller;
+                      });
+                    },
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.access_time,
-                        size: 16,
-                        color: Colors.grey,
+                )
+              : Center(child: Text(l10n.locationNotAvailable)),
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 16,
+            child: Card(
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  story.name,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleMedium,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const Divider(),
+                                Text(
+                                  story.description,
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                  maxLines: 5,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Image.network(
+                            story.photoUrl,
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        dateFormat.format(story.createdAt),
-                        style: const TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.location_on,
-                        size: 16,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          displayLocation,
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    story.description,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      dateFormat.format(story.createdAt),
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

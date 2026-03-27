@@ -82,9 +82,14 @@ class AppLocalizations {
       _isId ? 'Memuat lokasi...' : 'Loading location...';
   String get locationNotAvailable =>
       _isId ? 'Lokasi tidak tersedia' : 'Location not available';
+  String get locationNotSelected =>
+      _isId ? 'Lokasi belum dipilih' : 'Location not selected';
   String unknownLocation(double lat, double lon) => _isId
       ? 'Lokasi tidak diketahui ($lat, $lon)'
       : 'Unknown location ($lat, $lon)';
+
+  String get location => _isId ? 'Lokasi' : 'Location';
+  String get pickLocation => _isId ? 'Pilih Lokasi' : 'Pick Location';
 }
 
 class _AppLocalizationsDelegate
