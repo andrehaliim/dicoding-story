@@ -1,6 +1,5 @@
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class LocationHelper {
   Future<Position?> determinePosition() async {

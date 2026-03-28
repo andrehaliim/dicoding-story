@@ -25,22 +25,42 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String nickname = '';
-  late Future<List<StoryModel>> _stories;
+  List<StoryModel> stories = [];
+  int page = 1;
+  int size = 10;
+  final ScrollController scrollController = ScrollController();
+  bool isFirstLoad = false;
+  bool isLoadMore = false;
+  bool hasMore = true;
 
   @override
   void initState() {
     super.initState();
     getNickname();
     getStories();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >= scrollController.position.maxScrollExtent) {
+        if (!isLoadMore && hasMore) {
+          getMoreStories();
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
   }
 
   @override
   void didUpdateWidget(HomePage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.refreshCount != widget.refreshCount) {
-      setState(() {
-        getStories();
-      });
+      page = 1;
+      hasMore = true;
+      stories.clear();
+      getStories();
     }
   }
 
@@ -52,7 +72,64 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> getStories() async {
-    _stories = StoryProxy().getAllStories();
+    setState(() {
+      isFirstLoad = true;
+    });
+    try {
+      final fetchedStories =
+          await StoryProxy().getPaginationStories(page: page, size: size);
+      setState(() {
+        if (fetchedStories.length < size) {
+          hasMore = false;
+        } else {
+          hasMore = true;
+        }
+        stories.addAll(fetchedStories);
+        page++;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isFirstLoad = false;
+        });
+      }
+    }
+  }
+
+  Future<void> getMoreStories() async {
+    if (!mounted) return;
+    setState(() {
+      isLoadMore = true;
+    });
+    try {
+      final fetchedStories =
+          await StoryProxy().getPaginationStories(page: page, size: size);
+      setState(() {
+        if (fetchedStories.length < size) {
+          hasMore = false;
+        }
+        stories.addAll(fetchedStories);
+        page++;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading more: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoadMore = false;
+        });
+      }
+    }
   }
 
   @override
@@ -77,62 +154,62 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: FutureBuilder<List<StoryModel>>(
-        future: _stories,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            final stories = snapshot.data!;
-            return ListView.builder(
-              itemCount: stories.length,
-              itemBuilder: (context, index) {
-                final story = stories[index];
-                return GestureDetector(
-                  onTap: () {
-                    widget.onTapped(story);
-                  },
-                  child: Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 8.0,
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Image.network(
-                          story.photoUrl,
-                          width: double.infinity,
-                          height: 200,
-                          fit: BoxFit.cover,
+      body: isFirstLoad
+          ? const Center(child: CircularProgressIndicator())
+          : stories.isEmpty
+              ? Center(child: Text(l10n.noStories))
+              : ListView.builder(
+                  controller: scrollController,
+                  itemCount: stories.length + (hasMore ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == stories.length && hasMore) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                story.name,
-                                style: Theme.of(context).textTheme.titleLarge,
+                      );
+                    }
+                    final story = stories[index];
+                    return GestureDetector(
+                      onTap: () {
+                        widget.onTapped(story);
+                      },
+                      child: Card(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 8.0,
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Image.network(
+                              story.photoUrl,
+                              width: double.infinity,
+                              height: 200,
+                              fit: BoxFit.cover,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    story.name,
+                                    style: Theme.of(context).textTheme.titleLarge,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(story.description),
+                                ],
                               ),
-                              const SizedBox(height: 8),
-                              Text(story.description),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            );
-          }
-          return Center(child: Text(l10n.noStories));
-        },
-      ),
+                      ),
+                    );
+                  },
+                ),
       floatingActionButton: FloatingActionButton(
         onPressed: widget.onUpload,
         child: const Icon(Icons.add),
@@ -140,4 +217,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-

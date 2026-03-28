@@ -10,7 +10,6 @@ class MapPickerPage extends StatefulWidget {
 }
 
 class _MapPickerPageState extends State<MapPickerPage> {
-  GoogleMapController? _mapController;
   late Future<LatLng> _centerFuture;
   LatLng? _selectedLocation;
 
@@ -34,7 +33,6 @@ class _MapPickerPageState extends State<MapPickerPage> {
           IconButton(
             icon: const Icon(Icons.check),
             onPressed: () {
-              // Return result
               Navigator.pop(context, _selectedLocation);
             },
           ),
@@ -58,26 +56,12 @@ class _MapPickerPageState extends State<MapPickerPage> {
                     target: center,
                     zoom: 16,
                   ),
-                  onMapCreated: (controller) {
-                    _mapController = controller;
-                  },
 
-                  // 👇 Update center when user moves map
                   onCameraMove: (position) {
                     _selectedLocation = position.target;
                   },
-
-                  // Optional: detect when stop moving
-                  onCameraIdle: () {
-                    if (_selectedLocation != null) {
-                      print(
-                        "Selected: ${_selectedLocation!.latitude}, ${_selectedLocation!.longitude}",
-                      );
-                    }
-                  },
                 ),
 
-                // 👇 Center Marker (fixed)
                 const Center(
                   child: Icon(Icons.location_pin, size: 50, color: Colors.red),
                 ),

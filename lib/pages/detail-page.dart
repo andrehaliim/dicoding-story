@@ -18,6 +18,7 @@ class _DetailPageState extends State<DetailPage> {
   late GoogleMapController mapController;
   final Set<Marker> markers = {};
   bool _showMap = false;
+  bool _isLoadingMap = true;
 
   @override
   void initState() {
@@ -29,11 +30,25 @@ class _DetailPageState extends State<DetailPage> {
     final lat = widget.story.lat;
     final lon = widget.story.lon;
 
-    if (lat == null || lon == null) return;
+    if (lat == null || lon == null) {
+      if (mounted) {
+        setState(() {
+          _isLoadingMap = false;
+        });
+      }
+      return;
+    }
 
     final place = await LocationHelper().getLocationName(lat, lon);
 
-    if (place.isEmpty) return;
+    if (place.isEmpty) {
+      if (mounted) {
+        setState(() {
+          _isLoadingMap = false;
+        });
+      }
+      return;
+    }
 
     final marker = Marker(
       markerId: const MarkerId("storyLocation"),
@@ -46,9 +61,12 @@ class _DetailPageState extends State<DetailPage> {
       },
     );
     markers.add(marker);
-    setState(() {
-      _showMap = true;
-    });
+    if (mounted) {
+      setState(() {
+        _showMap = true;
+        _isLoadingMap = false;
+      });
+    }
   }
 
   @override
@@ -61,22 +79,25 @@ class _DetailPageState extends State<DetailPage> {
       appBar: AppBar(title: Text(l10n.detailStory)),
       body: Stack(
         children: [
-          _showMap
-              ? Center(
-                  child: GoogleMap(
-                    markers: markers,
-                    initialCameraPosition: CameraPosition(
-                      zoom: 18,
-                      target: LatLng(widget.story.lat!, widget.story.lon!),
-                    ),
-                    onMapCreated: (controller) {
-                      setState(() {
-                        mapController = controller;
-                      });
-                    },
-                  ),
-                )
-              : Center(child: Text(l10n.locationNotAvailable)),
+          if (_isLoadingMap)
+            const Center(child: CircularProgressIndicator())
+          else if (_showMap)
+            Center(
+              child: GoogleMap(
+                markers: markers,
+                initialCameraPosition: CameraPosition(
+                  zoom: 18,
+                  target: LatLng(widget.story.lat!, widget.story.lon!),
+                ),
+                onMapCreated: (controller) {
+                  setState(() {
+                    mapController = controller;
+                  });
+                },
+              ),
+            )
+          else
+            Center(child: Text(l10n.locationNotAvailable)),
           Positioned(
             left: 16,
             right: 16,

@@ -36,6 +36,34 @@ class StoryProxy {
     }
   }
 
+  Future<List<StoryModel>> getPaginationStories({
+    required int page,
+    required int size,
+  }) async {
+    final pref = await SharedPreferences.getInstance();
+    final token = pref.getString('token');
+
+    final requestUrl = '$url/stories?page=$page&size=$size';
+    final requestHeaders = {'Authorization': 'Bearer $token'};
+    final response = await http.get(
+      Uri.parse(requestUrl),
+      headers: requestHeaders,
+    );
+    LogHelper.apiFetchLog(
+      method: 'GET',
+      url: requestUrl,
+      parameters: requestHeaders,
+      response: response,
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = json.decode(response.body)['listStory'];
+      return jsonList.map((json) => StoryModel.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load stories');
+    }
+  }
+
   Future<bool> uploadStory({
     required File file,
     required String description,
