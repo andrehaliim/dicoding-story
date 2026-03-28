@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:story/models/story_model.dart';
 import 'package:story/pages/detail_page.dart';
 import 'package:story/pages/home_page.dart';
 import 'package:story/pages/login_page.dart';
+import 'package:story/pages/map_picker_page.dart';
 import 'package:story/pages/register_page.dart';
 import 'package:story/pages/upload_page.dart';
 import 'package:story/pages/logout_dialog_page.dart';
@@ -16,8 +18,10 @@ class MyRouterDelegate extends RouterDelegate
   bool isRegister = false;
   bool isUploading = false;
   bool isLogoutDialog = false;
+  bool isMapPicker = false;
   int storyRefreshCount = 0;
   StoryModel? selectedStory;
+  LatLng? selectedLocation;
 
   MyRouterDelegate() : _navigatorKey = GlobalKey<NavigatorState>() {
     _init();
@@ -59,6 +63,10 @@ class MyRouterDelegate extends RouterDelegate
         }
         if (page.key == const ValueKey('LogoutDialogPage')) {
           isLogoutDialog = false;
+          notifyListeners();
+        }
+        if (page.key == const ValueKey('MapPickerPage')) {
+          isMapPicker = false;
           notifyListeners();
         }
       },
@@ -135,9 +143,30 @@ class MyRouterDelegate extends RouterDelegate
       MaterialPage(
         key: const ValueKey('UploadPage'),
         child: UploadPage(
+          pickedLocation: selectedLocation,
           onUpload: () {
             isUploading = false;
+            selectedLocation = null;
             storyRefreshCount++;
+            notifyListeners();
+          },
+          onMapTap: () {
+            isMapPicker = true;
+            notifyListeners();
+          },
+        ),
+      ),
+    if (isMapPicker)
+      MaterialPage(
+        key: const ValueKey('MapPickerPage'),
+        child: MapPickerPage(
+          onPick: (LatLng pick) {
+            selectedLocation = pick;
+            isMapPicker = false;
+            notifyListeners();
+          },
+          onBack: () {
+            isMapPicker = false;
             notifyListeners();
           },
         ),

@@ -89,6 +89,7 @@ class _DetailPageState extends State<DetailPage> {
                   zoom: 18,
                   target: LatLng(widget.story.lat!, widget.story.lon!),
                 ),
+                zoomControlsEnabled: false,
                 onMapCreated: (controller) {
                   setState(() {
                     mapController = controller;

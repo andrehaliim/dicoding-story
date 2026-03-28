@@ -3,7 +3,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:story/helpers/location_helper.dart';
 
 class MapPickerPage extends StatefulWidget {
-  const MapPickerPage({super.key});
+  final Function(LatLng) onPick;
+  final Function() onBack;
+  const MapPickerPage({super.key, required this.onPick, required this.onBack});
 
   @override
   State<MapPickerPage> createState() => _MapPickerPageState();
@@ -33,7 +35,9 @@ class _MapPickerPageState extends State<MapPickerPage> {
           IconButton(
             icon: const Icon(Icons.check),
             onPressed: () {
-              Navigator.pop(context, _selectedLocation);
+              if (_selectedLocation != null) {
+                widget.onPick(_selectedLocation!);
+              }
             },
           ),
         ],

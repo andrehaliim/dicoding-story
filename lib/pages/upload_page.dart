@@ -6,12 +6,18 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:story/helpers/location_helper.dart';
 import 'package:story/l10n/app_localizations.dart';
-import 'package:story/pages/map_picker_page.dart';
 import 'package:story/proxys/story_proxy.dart';
 
 class UploadPage extends StatefulWidget {
   final Function() onUpload;
-  const UploadPage({super.key, required this.onUpload});
+  final Function() onMapTap;
+  final LatLng? pickedLocation;
+  const UploadPage({
+    super.key,
+    required this.onUpload,
+    required this.onMapTap,
+    this.pickedLocation,
+  });
 
   @override
   State<UploadPage> createState() => _UploadPageState();
@@ -29,6 +35,26 @@ class _UploadPageState extends State<UploadPage> {
   void initState() {
     super.initState();
     _getLocationName();
+  }
+
+  @override
+  void didUpdateWidget(covariant UploadPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.pickedLocation != oldWidget.pickedLocation &&
+        widget.pickedLocation != null) {
+      _updateSelectedLocation(widget.pickedLocation!);
+    }
+  }
+
+  Future<void> _updateSelectedLocation(LatLng selected) async {
+    String newLocation = await LocationHelper().getLocationName(
+      selected.latitude,
+      selected.longitude,
+    );
+    setState(() {
+      _selectedLatLng = selected;
+      _locationName = newLocation;
+    });
   }
 
   Future<void> _getLocationName() async {
@@ -204,24 +230,8 @@ class _UploadPageState extends State<UploadPage> {
                 ),
                 const SizedBox(width: 8),
                 GestureDetector(
-                  onTap: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const MapPickerPage()),
-                    );
-
-                    if (result != null) {
-                      LatLng selected = result;
-                      String newLocation = await LocationHelper()
-                          .getLocationName(
-                            selected.latitude,
-                            selected.longitude,
-                          );
-                      setState(() {
-                        _selectedLatLng = selected;
-                        _locationName = newLocation;
-                      });
-                    }
+                  onTap: () {
+                    widget.onMapTap();
                   },
                   child: Icon(Icons.edit),
                 ),
