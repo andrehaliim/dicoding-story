@@ -3,10 +3,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:story/l10n/app_localizations.dart';
 import 'package:story/providers/locale_provider.dart';
+import 'package:story/providers/config_provider.dart';
 import 'package:story/routes/router_delegate.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await ConfigProvider.init();
   runApp(
     ChangeNotifierProvider(
       create: (_) => LocaleProvider(),
@@ -35,7 +37,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     final localeProvider = context.watch<LocaleProvider>();
     return MaterialApp(
-      title: 'Dicoding Story',
+      title: 'Dicoding Story ${ConfigProvider.isFree ? 'Free' : 'Paid'}',
       locale: localeProvider.locale,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [

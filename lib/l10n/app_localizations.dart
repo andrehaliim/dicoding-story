@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:story/providers/config_provider.dart';
 
 class AppLocalizations {
   final Locale locale;
@@ -16,8 +17,11 @@ class AppLocalizations {
 
   bool get _isId => locale.languageCode == 'id';
 
-  String get appTitle => _isId ? 'Cerita' : 'Story';
-  String get story => _isId ? 'Cerita' : 'Story';
+  String get flavorName =>
+      ConfigProvider.isFree ? 'Free Version' : 'Paid Version';
+
+  String get appTitle => '${_isId ? 'Cerita' : 'Story'} $flavorName';
+  String get story => '${_isId ? 'Cerita' : 'Story'} $flavorName';
 
   String get logout => _isId ? 'Keluar' : 'Logout';
   String get logoutConfirm => _isId
@@ -28,8 +32,8 @@ class AppLocalizations {
   String get switchLanguage => _isId ? 'Ganti Bahasa' : 'Switch Language';
 
   String get welcomeTo => _isId
-      ? 'Selamat datang di\nDicoding Story'
-      : 'Welcome to\nDicoding Story';
+      ? 'Selamat datang di\nDicoding Story $flavorName'
+      : 'Welcome to\nDicoding Story $flavorName';
   String get email => _isId ? 'Email' : 'Email';
   String get password => _isId ? 'Kata Sandi' : 'Password';
   String get enterEmail =>
@@ -90,6 +94,9 @@ class AppLocalizations {
 
   String get location => _isId ? 'Lokasi' : 'Location';
   String get pickLocation => _isId ? 'Pilih Lokasi' : 'Pick Location';
+  String get featureNotAvailable => _isId
+      ? 'Fitur tersedia di versi Pro'
+      : 'Feature available in Pro version';
 }
 
 class _AppLocalizationsDelegate

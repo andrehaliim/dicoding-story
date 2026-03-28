@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:story/helpers/location_helper.dart';
 import 'package:story/l10n/app_localizations.dart';
+import 'package:story/providers/config_provider.dart';
 import 'package:story/proxys/story_proxy.dart';
 
 class UploadPage extends StatefulWidget {
@@ -231,7 +232,11 @@ class _UploadPageState extends State<UploadPage> {
                 const SizedBox(width: 8),
                 GestureDetector(
                   onTap: () {
-                    widget.onMapTap();
+                    !ConfigProvider.isFree
+                        ? widget.onMapTap()
+                        : ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text(l10n.featureNotAvailable)));
                   },
                   child: Icon(Icons.edit),
                 ),
