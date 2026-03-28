@@ -5,7 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:story/models/story-model.dart';
+import 'package:story/models/story_model.dart';
+import 'package:story/models/story_response.dart';
 import '../helpers/log-helper.dart';
 
 class StoryProxy {
@@ -17,10 +18,12 @@ class StoryProxy {
 
     final requestUrl = '$url/stories';
     final requestHeaders = {'Authorization': 'Bearer $token'};
+
     final response = await http.get(
       Uri.parse(requestUrl),
       headers: requestHeaders,
     );
+
     LogHelper.apiFetchLog(
       method: 'GET',
       url: requestUrl,
@@ -29,8 +32,11 @@ class StoryProxy {
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonList = json.decode(response.body)['listStory'];
-      return jsonList.map((json) => StoryModel.fromJson(json)).toList();
+      final jsonBody = jsonDecode(response.body);
+
+      final result = StoryResponse.fromJson(jsonBody);
+
+      return result.listStory;
     } else {
       throw Exception('Failed to load stories');
     }
@@ -43,12 +49,18 @@ class StoryProxy {
     final pref = await SharedPreferences.getInstance();
     final token = pref.getString('token');
 
+    if (token == null) {
+      throw Exception('Token not found');
+    }
+
     final requestUrl = '$url/stories?page=$page&size=$size';
     final requestHeaders = {'Authorization': 'Bearer $token'};
+
     final response = await http.get(
       Uri.parse(requestUrl),
       headers: requestHeaders,
     );
+
     LogHelper.apiFetchLog(
       method: 'GET',
       url: requestUrl,
@@ -57,8 +69,15 @@ class StoryProxy {
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonList = json.decode(response.body)['listStory'];
-      return jsonList.map((json) => StoryModel.fromJson(json)).toList();
+      final jsonBody = jsonDecode(response.body);
+
+      final result = StoryResponse.fromJson(jsonBody);
+
+      if (result.error) {
+        throw Exception(result.message);
+      }
+
+      return result.listStory;
     } else {
       throw Exception('Failed to load stories');
     }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:story/helpers/location-helper.dart';
 import 'package:story/l10n/app_localizations.dart';
-import 'package:story/models/story-model.dart';
+import 'package:story/models/story_model.dart';
 import 'package:intl/intl.dart';
 
 class DetailPage extends StatefulWidget {

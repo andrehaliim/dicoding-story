@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:story/models/story-model.dart';
+import 'package:story/models/story_model.dart';
 import 'package:story/pages/detail-page.dart';
 import 'package:story/pages/home-page.dart';
 import 'package:story/pages/login-page.dart';

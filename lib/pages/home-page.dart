@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story/l10n/app_localizations.dart';
 import 'package:story/providers/locale_provider.dart';
-import 'package:story/models/story-model.dart';
+import 'package:story/models/story_model.dart';
 import 'package:story/proxys/story-proxy.dart';
 
 class HomePage extends StatefulWidget {
@@ -39,7 +39,8 @@ class _HomePageState extends State<HomePage> {
     getNickname();
     getStories();
     scrollController.addListener(() {
-      if (scrollController.position.pixels >= scrollController.position.maxScrollExtent) {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent) {
         if (!isLoadMore && hasMore) {
           getMoreStories();
         }
@@ -76,8 +77,10 @@ class _HomePageState extends State<HomePage> {
       isFirstLoad = true;
     });
     try {
-      final fetchedStories =
-          await StoryProxy().getPaginationStories(page: page, size: size);
+      final fetchedStories = await StoryProxy().getPaginationStories(
+        page: page,
+        size: size,
+      );
       setState(() {
         if (fetchedStories.length < size) {
           hasMore = false;
@@ -89,9 +92,9 @@ class _HomePageState extends State<HomePage> {
       });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) {
@@ -108,8 +111,10 @@ class _HomePageState extends State<HomePage> {
       isLoadMore = true;
     });
     try {
-      final fetchedStories =
-          await StoryProxy().getPaginationStories(page: page, size: size);
+      final fetchedStories = await StoryProxy().getPaginationStories(
+        page: page,
+        size: size,
+      );
       setState(() {
         if (fetchedStories.length < size) {
           hasMore = false;
@@ -119,9 +124,9 @@ class _HomePageState extends State<HomePage> {
       });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading more: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error loading more: $e')));
       }
     } finally {
       if (mounted) {
@@ -157,59 +162,59 @@ class _HomePageState extends State<HomePage> {
       body: isFirstLoad
           ? const Center(child: CircularProgressIndicator())
           : stories.isEmpty
-              ? Center(child: Text(l10n.noStories))
-              : ListView.builder(
-                  controller: scrollController,
-                  itemCount: stories.length + (hasMore ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index == stories.length && hasMore) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    }
-                    final story = stories[index];
-                    return GestureDetector(
-                      onTap: () {
-                        widget.onTapped(story);
-                      },
-                      child: Card(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 8.0,
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.network(
-                              story.photoUrl,
-                              width: double.infinity,
-                              height: 200,
-                              fit: BoxFit.cover,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    story.name,
-                                    style: Theme.of(context).textTheme.titleLarge,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(story.description),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
+          ? Center(child: Text(l10n.noStories))
+          : ListView.builder(
+              controller: scrollController,
+              itemCount: stories.length + (hasMore ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (index == stories.length && hasMore) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+                final story = stories[index];
+                return GestureDetector(
+                  onTap: () {
+                    widget.onTapped(story);
                   },
-                ),
+                  child: Card(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Image.network(
+                          story.photoUrl,
+                          width: double.infinity,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                story.name,
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(story.description),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: widget.onUpload,
         child: const Icon(Icons.add),
