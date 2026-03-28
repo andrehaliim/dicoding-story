@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:story/helpers/location-helper.dart';
+import 'package:story/helpers/location_helper.dart';
 
 class MapPickerPage extends StatefulWidget {
   const MapPickerPage({super.key});

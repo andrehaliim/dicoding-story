@@ -7,7 +7,7 @@ import 'package:image/image.dart' as img;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story/models/story_model.dart';
 import 'package:story/models/story_response.dart';
-import '../helpers/log-helper.dart';
+import '../helpers/log_helper.dart';
 
 class StoryProxy {
   final url = 'https://story-api.dicoding.dev/v1';

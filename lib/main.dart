@@ -3,7 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:story/l10n/app_localizations.dart';
 import 'package:story/providers/locale_provider.dart';
-import 'package:story/routes/router-delegate.dart';
+import 'package:story/routes/router_delegate.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

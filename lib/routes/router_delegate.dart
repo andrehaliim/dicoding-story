@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:story/models/story_model.dart';
-import 'package:story/pages/detail-page.dart';
-import 'package:story/pages/home-page.dart';
-import 'package:story/pages/login-page.dart';
-import 'package:story/pages/register-page.dart';
-import 'package:story/pages/upload-page.dart';
-import 'package:story/pages/logout-dialog-page.dart';
-import 'package:story/proxys/login-proxy.dart';
+import 'package:story/pages/detail_page.dart';
+import 'package:story/pages/home_page.dart';
+import 'package:story/pages/login_page.dart';
+import 'package:story/pages/register_page.dart';
+import 'package:story/pages/upload_page.dart';
+import 'package:story/pages/logout_dialog_page.dart';
+import 'package:story/proxys/login_proxy.dart';
 
 class MyRouterDelegate extends RouterDelegate
     with ChangeNotifier, PopNavigatorRouterDelegateMixin {

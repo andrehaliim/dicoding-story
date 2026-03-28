@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:story/l10n/app_localizations.dart';
-import 'package:story/proxys/login-proxy.dart';
+import 'package:story/proxys/login_proxy.dart';
 
 class RegisterPage extends StatefulWidget {
   final Function() onRegister;

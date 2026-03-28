@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:story/helpers/location-helper.dart';
+import 'package:story/helpers/location_helper.dart';
 import 'package:story/l10n/app_localizations.dart';
-import 'package:story/pages/map-picker-page.dart';
-import 'package:story/proxys/story-proxy.dart';
+import 'package:story/pages/map_picker_page.dart';
+import 'package:story/proxys/story_proxy.dart';
 
 class UploadPage extends StatefulWidget {
   final Function() onUpload;

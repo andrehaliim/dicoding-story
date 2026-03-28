@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story/l10n/app_localizations.dart';
 import 'package:story/providers/locale_provider.dart';
 import 'package:story/models/story_model.dart';
-import 'package:story/proxys/story-proxy.dart';
+import 'package:story/proxys/story_proxy.dart';
 
 class HomePage extends StatefulWidget {
   final Function(StoryModel) onTapped;

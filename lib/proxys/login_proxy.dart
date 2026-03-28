@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../helpers/log-helper.dart';
+import '../helpers/log_helper.dart';
 
 class LoginProxy {
   final url = 'https://story-api.dicoding.dev/v1';
