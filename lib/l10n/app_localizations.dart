@@ -97,6 +97,11 @@ class AppLocalizations {
   String get featureNotAvailable => _isId
       ? 'Fitur tersedia di versi Pro'
       : 'Feature available in Pro version';
+  String get locationPermissionDenied =>
+      _isId ? 'Lokasi ditolak' : 'Location permission denied';
+  String get locationPermissionDeniedForever => _isId
+      ? 'Lokasi ditolak permanen, buka pengaturan untuk mengaktifkan'
+      : 'Location permission denied forever, open settings to enable';
 }
 
 class _AppLocalizationsDelegate

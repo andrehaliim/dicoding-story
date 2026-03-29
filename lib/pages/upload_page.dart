@@ -114,13 +114,6 @@ class _UploadPageState extends State<UploadPage> {
     });
 
     try {
-      if (_selectedLatLng == null && _position == null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.locationNotSelected)));
-        return;
-      }
-
       double? lat = _selectedLatLng?.latitude ?? _position?.latitude;
       double? lon = _selectedLatLng?.longitude ?? _position?.longitude;
 
@@ -231,12 +224,38 @@ class _UploadPageState extends State<UploadPage> {
                 ),
                 const SizedBox(width: 8),
                 GestureDetector(
-                  onTap: () {
-                    !ConfigProvider.isFree
-                        ? widget.onMapTap()
-                        : ScaffoldMessenger.of(
-                            context,
-                          ).showSnackBar(SnackBar(content: Text(l10n.featureNotAvailable)));
+                  onTap: () async {
+                    if (!ConfigProvider.isFree) {
+                      LocationPermission permission =
+                          await Geolocator.checkPermission();
+
+                      if (permission == LocationPermission.denied) {
+                        permission = await Geolocator.requestPermission();
+                        if (permission == LocationPermission.denied) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(l10n.locationPermissionDenied),
+                            ),
+                          );
+                          return;
+                        }
+                      }
+
+                      if (permission == LocationPermission.deniedForever) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.locationPermissionDeniedForever),
+                          ),
+                        );
+                        return;
+                      }
+
+                      widget.onMapTap();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l10n.featureNotAvailable)),
+                      );
+                    }
                   },
                   child: Icon(Icons.edit),
                 ),
