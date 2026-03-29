@@ -12,64 +12,62 @@ class LoginProxy {
   final url = 'https://story-api.dicoding.dev/v1';
 
   Future<bool> doLogin(String email, String password) async {
-  final requestUrl = '$url/login';
-  final requestBody = LoginRequest(email: email, password: password).toJson();
+    final requestUrl = '$url/login';
+    final requestBody = LoginRequest(email: email, password: password).toJson();
 
-  final response = await http.post(
-    Uri.parse(requestUrl),
-    body: requestBody,
-  );
+    final response = await http.post(Uri.parse(requestUrl), body: requestBody);
 
-  LogHelper.apiFetchLog(
-    method: 'POST',
-    url: requestUrl,
-    parameters: requestBody,
-    response: response,
-  );
+    LogHelper.apiFetchLog(
+      method: 'POST',
+      url: requestUrl,
+      parameters: requestBody,
+      response: response,
+    );
 
-  final jsonResponse = jsonDecode(response.body);
+    final jsonResponse = jsonDecode(response.body);
 
-  if (response.statusCode == 200) {
-    final loginResponse = LoginResponse.fromJson(jsonResponse);
-    final result = loginResponse.loginResult;
+    if (response.statusCode == 200) {
+      final loginResponse = LoginResponse.fromJson(jsonResponse);
+      final result = loginResponse.loginResult;
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('token', result.token);
-    await prefs.setString('userId', result.userId);
-    await prefs.setString('name', result.name);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', result.token);
+      await prefs.setString('userId', result.userId);
+      await prefs.setString('name', result.name);
 
-    return true;
-  } else {
-    throw Exception(jsonResponse['message']);
+      return true;
+    } else {
+      throw Exception(jsonResponse['message']);
+    }
   }
-}
 
   Future<bool> doRegister(String name, String email, String password) async {
-  final requestUrl = '$url/register';
+    final requestUrl = '$url/register';
 
-  final requestBody = RegisterRequest(name: name, email: email, password: password).toJson();
+    final requestBody = RegisterRequest(
+      name: name,
+      email: email,
+      password: password,
+    ).toJson();
 
-  final response = await http.post(
-    Uri.parse(requestUrl),
-    body: requestBody,
-  );
+    final response = await http.post(Uri.parse(requestUrl), body: requestBody);
 
-  LogHelper.apiFetchLog(
-    method: 'POST',
-    url: requestUrl,
-    parameters: requestBody,
-    response: response,
-  );
+    LogHelper.apiFetchLog(
+      method: 'POST',
+      url: requestUrl,
+      parameters: requestBody,
+      response: response,
+    );
 
-  final jsonResponse = jsonDecode(response.body);
-  final registerResponse = RegisterResponse.fromJson(jsonResponse);
+    final jsonResponse = jsonDecode(response.body);
+    final registerResponse = RegisterResponse.fromJson(jsonResponse);
 
-  if (response.statusCode == 200 || response.statusCode == 201) {
-    return true;
-  } else {
-    throw Exception(registerResponse.message);
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return true;
+    } else {
+      throw Exception(registerResponse.message);
+    }
   }
-}
 
   Future<bool> doLogout() async {
     final prefs = await SharedPreferences.getInstance();
